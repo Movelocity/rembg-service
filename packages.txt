@@ -1,0 +1,17 @@
+jsonschema
+numpy
+scipy
+fsspec
+fastapi
+onnxruntime
+opencv-python-headless
+pillow
+#pymatting
+scikit-image
+scipy
+tqdm
+gradio
+uvicorn
+Pillow
+torch
+transformers
