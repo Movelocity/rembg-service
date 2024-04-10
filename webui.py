@@ -1,4 +1,4 @@
-import os
+import os, io
 import zipfile
 import time
 import gradio as gr
@@ -56,39 +56,48 @@ def handle_up_image(pil_img, model_str="silueta"):
         print(e)
         return None
 
-def ext_as_png(image_dir):
-    base = os.path.splitext(image_dir)[0]
+def base_png(image_dir):
+    """/path/to/your/file.txt => file.png"""
+    base = os.path.basename(image_dir).split('.')[0]
     return base + ".png"
 
-def batch_infer(imgs:list[PILImage], model_str="silueta"):
-    results = []
-    for img in imgs:
-        masked_image = handle_up_image(img)  # 暂时使用单张推理
-        results.append(masked_image)
-    return results
+def batch_infer(imgs, model_str="silueta"):
+    pass
 
 def multiple_files(files, tmp):
-    # all files are images
+    # All files are images
     if not files:
         return None
-    fpaths = [f.name for f in files]
-    folder = os.path.dirname(fpaths[0])
     
-    for fp in fpaths:
-        pil_img = Image.open(fp)
-        masked_image = handle_up_image(pil_img)  # 暂时使用单张推理
-        masked_image.save(ext_as_png(fp))  # 直接覆盖
+    bytesIO_images = []
+    for f in files:
+        # Open the image and handle it
+        pil_img = Image.open(f.name)
+        out_img = handle_up_image(pil_img)
+
+        # 将处理结果保存在内存中
+        img_bytes = io.BytesIO()
+        out_img.save(img_bytes, format='PNG')
+
+        # Append the image
+        bytesIO_images.append((base_png(f.name), img_bytes))
         
-    # Create a zip file named as {begin}-{end}.zip
-    begin = os.path.basename(fpaths[0]).split('.')[0][:10]
-    end = os.path.basename(fpaths[-1]).split('.')[0][:10]
-    # The dirname function gets the directory from the file path
-    zip_path = os.path.join(folder, f'{begin}-{end}.zip') 
+    # zip文件命名为 {begin}-{end}.zip
+    folder = os.path.dirname(files[0].name)
+    begin = os.path.basename(files[0].name).split('.')[0][:7]
+    end = os.path.basename(files[-1].name).split('.')[0][:7]
+    zip_path = os.path.join(folder, f'{begin}-{end}.zip')
     
+    # 写入zip文件
     with zipfile.ZipFile(zip_path, 'w') as myzip:
-        for fp in fpaths:
-            myzip.write(ext_as_png(fp), arcname=os.path.basename(ext_as_png(fp)))
-            os.remove(fp)  # Removes the file after it's written into zip
+        for name, bimg in bytesIO_images:
+            # Write BytesIO object to zip file
+            bimg.seek(0) # go to the start of the BytesIO object
+            myzip.writestr(name, bimg.read()) 
+
+    # 临时文件不用保存
+    for f in files:
+        os.remove(f.name)
     return zip_path
 
 css = """
