@@ -29,7 +29,8 @@ class RMBG14Session(BaseSession):
         """Initialize an instance of the BaseSession class."""
         self.model_name = model_name
         self.providers = []
-        self.model = AutoModelForImageSegmentation.from_pretrained("model_weights/rmbg14", trust_remote_code=True).eval().to(device)
+        self.model = AutoModelForImageSegmentation.from_pretrained(
+            "model_weights/rmbg14", trust_remote_code=True).eval().to(device)
     
     # def predict(self, img: PILImage, *args, **kwargs) -> List[PILImage]:
     #     """
