@@ -1,0 +1,76 @@
+/*
+Gradio 功能植入
+
+包括:
+- 展示短消息 showToast(字符串, 持续毫秒)
+- 植入亮暗切换按钮，在页面底部。页面加载时马上切换到用户之前的选择
+- 解决非https网页无法自动复制的问题，为 Textbox 组件添加 with_copy_btn 样式类即可注入复制按钮
+
+新加入的配置函数请加入到 setupTasks 中。
+*/
+#toast {
+  visibility: hidden;
+  max-width: 80%; /* Ensure it doesn't take more than 80% of the screen width */
+  width: fit-content;
+  height: fit-content;
+  color: var(--block-label-text-color);
+  border: var(--block-label-border-width) solid var(--border-color-primary);
+  background: var(--block-label-background-fill);
+  text-align: center;
+  border-radius: 6px;
+  padding: 6px 12px;
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  top: 5%;
+  font-size: 14px;
+  transform: translateX(-50%);
+}
+#toast.show {
+  /* display: inline; */
+  visibility: visible;
+  -webkit-animation: fade-in 2s;
+  animation: fade-in 2s;
+}
+@-webkit-keyframes fade-in {
+  0% { top: 0; opacity: 0; visibility: hidden; }
+  25%, 75%, 100% { top: 5%; opacity: 1; visibility: visible; }
+}
+@keyframes fade-in {
+  0% { top: 0; opacity: 0; visibility: hidden; }
+  25%, 75%, 100% { top: 5%; opacity: 1; visibility: visible; }
+}
+
+.copy_btn {
+  position: absolute;
+  top: var(--block-label-margin);
+  right: var(--block-label-margin);
+  display: inline-flex;
+  align-items: center;
+  z-index: var(--layer-2);
+  box-shadow: var(--block-label-shadow);
+  border: var(--block-label-border-width) solid var(--border-color-primary);
+  border-top: none;
+  border-right: none;
+  border-radius: 0 calc( 8px - 1px) 0 calc( 8px - 1px);
+  background: var(--block-label-background-fill);
+  padding: var(--block-label-padding);
+  cursor: pointer;
+  color: var(--block-label-text-color);
+  font-weight: var(--block-label-text-weight);
+  font-size: var(--block-label-text-size);
+  line-height: var(--line-sm);
+}
+.text_btn{
+  cursor: pointer;
+}
+.text_btn:hover {
+  color: var(--body-text-color);
+}
+.image-container {
+  padding: 30px 0 10px 0;
+}
+.upload-container{
+  width: 100%;
+}
+
